@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=no">
+    <title>QR કોડ ડાઉનલોડ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Hind+Vadodara:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', 'Hind Vadodara', -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 16px;
+            color: #0f172a;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Tabs Section */
+        .tab-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .tab-btn {
+            background: #ffffff;
+            border: 2.5px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:active {
+            transform: scale(0.97);
+        }
+
+        .tab-btn.active {
+            background: #ffffff;
+            box-shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.12);
+        }
+
+        .tab-btn.active.post-btn {
+            border-color: #dc2626;
+        }
+
+        .tab-btn.active.fam-btn {
+            border-color: #ea580c;
+        }
+
+        .pill-indicator {
+            width: 38px;
+            height: 5px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .post-pill { background: #dc2626; }
+        .fam-pill { background: #ea580c; }
+
+        .tab-text {
+            font-size: 20px;
+            font-weight: 800;
+            color: #334155;
+        }
+
+        .tab-btn.active .tab-text {
+            color: #0f172a;
+        }
+
+        /* Card Container */
+        .qr-card {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 24px 20px;
+            box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Title inside Card */
+        .qr-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .post-title { color: #dc2626; }
+        .fam-title { color: #ea580c; }
+
+        /* QR Frame */
+        .qr-frame {
+            width: 100%;
+            max-width: 320px;
+            aspect-ratio: 1;
+            background: #fafafa;
+            border-radius: 20px;
+            border: 2px dashed #cbd5e1;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .qr-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+
+        /* Download Button */
+        .btn-download {
+            width: 100%;
+            height: 64px;
+            background: #0f172a;
+            color: #ffffff;
+            border-radius: 20px;
+            font-size: 20px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
+            transition: transform 0.15s ease, background-color 0.2s ease;
+        }
+
+        .btn-download:active {
+            transform: scale(0.97);
+            background: #1e293b;
+        }
+
+        .btn-download svg {
+            width: 26px;
+            height: 26px;
+            stroke-width: 2.5;
+        }
+
+        /* Simple Note for Papa */
+        .guide-box {
+            background: #f8fafc;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            padding: 14px 16px;
+            margin-top: 16px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .guide-box p {
+            font-size: 14px;
+            font-weight: 700;
+            color: #475569;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Two Choice Tabs -->
+        <div class="tab-box">
+            <button class="tab-btn active post-btn" id="postTab" onclick="selectTab('post')">
+                <div class="pill-indicator post-pill"></div>
+                <span class="tab-text">Indian Post</span>
+            </button>
+            <button class="tab-btn fam-btn" id="famTab" onclick="selectTab('fam')">
+                <div class="pill-indicator fam-pill"></div>
+                <span class="tab-text">FamPay</span>
+            </button>
+        </div>
+
+        <!-- Main Display Card -->
+        <div class="qr-card">
+            <h2 class="qr-title post-title" id="cardHeading">Indian Post QR</h2>
+
+            <!-- QR Photo Frame -->
+            <div class="qr-frame">
+                <img id="qrImage" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjRq2PN7D3Qms4sYQI0PYUrPrlne9gVGrmLTSeCwl5kA3Uk5x6cI1YrFHq6HpUevfwwipRg0NphsNUxXSG-W9Nt6ZK0UhrQs8scn0sOgw_N4sj3iF3NvWctoE3OU5QfBdlWT1Y6JJEARlAjABcCmCigtEqY1RaGSr7XoTL5LpvxypkJfk0SW2h3McwKgdI/s1521/1000037330.png" alt="QR Code">
+            </div>
+
+            <!-- Single Download Button -->
+            <button class="btn-download" onclick="downloadQRCode()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                QR કોડ ડાઉનલોડ કરો
+            </button>
+
+            <!-- Gujarati Easy Steps Guide -->
+            <div class="guide-box">
+                <p>👉 ડાઉનલોડ કર્યા પછી GPay / PhonePe ખોલીને સ્કેનરમાં ગેલેરીમાંથી આ ફોટો સિલેક્ટ કરવો.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const qrData = {
+            post: {
+                title: "Indian Post QR",
+                titleClass: "post-title",
+                imgUrl: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjRq2PN7D3Qms4sYQI0PYUrPrlne9gVGrmLTSeCwl5kA3Uk5x6cI1YrFHq6HpUevfwwipRg0NphsNUxXSG-W9Nt6ZK0UhrQs8scn0sOgw_N4sj3iF3NvWctoE3OU5QfBdlWT1Y6JJEARlAjABcCmCigtEqY1RaGSr7XoTL5LpvxypkJfk0SW2h3McwKgdI/s1521/1000037330.png",
+                fileName: "Indian_Post_QR.png"
+            },
+            fam: {
+                title: "FamPay QR",
+                titleClass: "fam-title",
+                imgUrl: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjjZUzhw7gLlDmCmSHBAs4DalkwSsca3elp1KiZxVMIhE2tafDNT-oWn-ywPslUuSh0knTXmLU59u-GwBi7D-1KOi3hEe1N_VE28HtxkHmIC4l3CGBWF7uxfgPpzMsN3HN-oIBsU5bmdeGk7YV0ZDe71TR2Xr8ThDb4QoVzOF4ndiuj2M1Ey8PkhUvBetI/s759/1000037329.png",
+                fileName: "FamPay_QR.png"
+            }
+        };
+
+        let currentTab = 'post';
+
+        function selectTab(type) {
+            currentTab = type;
+            const postTab = document.getElementById('postTab');
+            const famTab = document.getElementById('famTab');
+            const cardHeading = document.getElementById('cardHeading');
+            const qrImage = document.getElementById('qrImage');
+
+            if (type === 'post') {
+                postTab.classList.add('active');
+                famTab.classList.remove('active');
+                cardHeading.className = 'qr-title post-title';
+            } else {
+                famTab.classList.add('active');
+                postTab.classList.remove('active');
+                cardHeading.className = 'qr-title fam-title';
+            }
+
+            cardHeading.innerText = qrData[type].title;
+            qrImage.src = qrData[type].imgUrl;
+        }
+
+        async function downloadQRCode() {
+            const data = qrData[currentTab];
+            try {
+                const response = await fetch(data.imgUrl);
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = data.fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(blobUrl);
+            } catch (e) {
+                // ફોલબેક જો ક્રોસ-ઓરિજિન બ્લોક થાય
+                window.open(data.imgUrl, '_blank');
+            }
+        }
+    </script>
+</body>
+</html>
