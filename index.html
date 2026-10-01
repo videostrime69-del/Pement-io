@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>સરળ પેમેન્ટ - QR Pay</title>
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Vadodara:wght@600;700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background-color: #f8fafc;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.06) 0px, transparent 40%),
+                radial-gradient(at 100% 100%, rgba(225, 29, 72, 0.06) 0px, transparent 40%);
+            font-family: 'Plus Jakarta Sans', 'Hind Vadodara', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 16px;
+            color: #0f172a;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 440px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* Top Header */
+        .header {
+            text-align: center;
+            padding-bottom: 2px;
+        }
+
+        .user-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 18px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 9999px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #334155;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            margin-bottom: 10px;
+        }
+
+        .live-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+
+        .header h1 {
+            font-size: 30px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 16px;
+            color: #64748b;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* Selector Switcher for FamPay & Indian Post */
+        .tabs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .tab-btn {
+            position: relative;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 16px 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tab-btn:active {
+            transform: scale(0.97);
+        }
+
+        .tab-btn .tab-name {
+            font-size: 20px;
+            font-weight: 800;
+            color: #334155;
+            letter-spacing: -0.2px;
+        }
+
+        .tab-btn .tab-sub {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #94a3b8;
+        }
+
+        /* Active Tab State */
+        .tab-btn.active-fampay {
+            background: #fffbeb;
+            border-color: #f59e0b;
+            box-shadow: 0 10px 24px -4px rgba(245, 158, 11, 0.22);
+        }
+
+        .tab-btn.active-fampay .tab-name {
+            color: #b45309;
+        }
+
+        .tab-btn.active-fampay .tab-sub {
+            color: #d97706;
+        }
+
+        .tab-btn.active-post {
+            background: #fef2f2;
+            border-color: #ef4444;
+            box-shadow: 0 10px 24px -4px rgba(239, 68, 68, 0.22);
+        }
+
+        .tab-btn.active-post .tab-name {
+            color: #b91c1c;
+        }
+
+        .tab-btn.active-post .tab-sub {
+            color: #dc2626;
+        }
+
+        /* Main QR Display Card */
+        .qr-card {
+            background: #ffffff;
+            border: 2px solid #edf2f7;
+            border-radius: 28px;
+            padding: 24px 20px;
+            text-align: center;
+            box-shadow: 0 20px 35px -8px rgba(15, 23, 42, 0.06);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .qr-frame {
+            width: 100%;
+            max-width: 290px;
+            aspect-ratio: 1 / 1;
+            background: #f8fafc;
+            border-radius: 22px;
+            padding: 12px;
+            border: 1.5px dashed #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+        }
+
+        .qr-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        /* Large Action Buttons */
+        .action-group {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-action {
+            width: 100%;
+            min-height: 64px;
+            border-radius: 18px;
+            font-size: 19px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+            font-family: inherit;
+        }
+
+        .btn-action:active {
+            transform: scale(0.97);
+        }
+
+        .btn-download {
+            background: #0f172a;
+            color: #ffffff;
+            box-shadow: 0 10px 20px -4px rgba(15, 23, 42, 0.25);
+        }
+
+        .btn-download:active {
+            background: #1e293b;
+        }
+
+        .btn-direct {
+            background: #2563eb;
+            color: #ffffff;
+            box-shadow: 0 10px 20px -4px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-direct:active {
+            background: #1d4ed8;
+        }
+
+        .btn-icon {
+            width: 24px;
+            height: 24px;
+            stroke-width: 2.5;
+        }
+
+        /* Help Box for Dad */
+        .info-box {
+            background: #f1f5f9;
+            border-radius: 18px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .info-icon {
+            width: 22px;
+            height: 22px;
+            color: #2563eb;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .info-text {
+            font-size: 13.5px;
+            color: #475569;
+            font-weight: 600;
+            line-height: 1.5;
+            text-align: left;
+        }
+
+        /* Toast Feedback */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #0f172a;
+            color: #ffffff;
+            padding: 14px 24px;
+            border-radius: 9999px;
+            font-size: 15px;
+            font-weight: 700;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Header -->
+        <header class="header">
+            <div class="user-tag">
+                <span class="live-dot"></span>
+                <span>ચિંતન લિંબાચીયા</span>
+            </div>
+            <h1>QR કોડથી પેમેન્ટ</h1>
+            <p>પહેલા ખાતું પસંદ કરો</p>
+        </header>
+
+        <!-- 2 Selection Tabs: FamPay & Indian Post -->
+        <div class="tabs-grid">
+            <button id="tabFampay" class="tab-btn active-fampay" onclick="selectAccount('fampay')">
+                <span class="tab-name">Fam Pay</span>
+                <span class="tab-sub">પસંદ કરેલું છે</span>
+            </button>
+            <button id="tabPost" class="tab-btn" onclick="selectAccount('post')">
+                <span class="tab-name">Indian Post</span>
+                <span class="tab-sub">ક્લિક કરો</span>
+            </button>
+        </div>
+
+        <!-- Main Card with Dynamic QR Image -->
+        <main class="qr-card">
+            
+            <div class="qr-frame">
+                <img id="qrDisplay" class="qr-image" 
+                     src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjjZUzhw7gLlDmCmSHBAs4DalkwSsca3elp1KiZxVMIhE2tafDNT-oWn-ywPslUuSh0knTXmLU59u-GwBi7D-1KOi3hEe1N_VE28HtxkHmIC4l3CGBWF7uxfgPpzMsN3HN-oIBsU5bmdeGk7YV0ZDe71TR2Xr8ThDb4QoVzOF4ndiuj2M1Ey8PkhUvBetI/s759/1000037329.png" 
+                     alt="UPI QR Code" 
+                     loading="eager" />
+            </div>
+
+            <!-- Two Big Action Buttons -->
+            <div class="action-group">
+                <!-- 1. Download QR -->
+                <button type="button" class="btn-action btn-download" onclick="downloadActiveQR()">
+                    <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
+                    <span>QR કોડ ડાઉનલોડ કરો</span>
+                </button>
+
+                <!-- 2. Direct Pay Intent -->
+                <button type="button" class="btn-action btn-direct" onclick="triggerDirectPay()">
+                    <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6H2.25m0 0H3m0 0h18m-18 0a60.07 60.07 0 0015.797-2.101c.727-.198 1.453.342 1.453 1.096V4.5M3 6l9 6 9-6" />
+                    </svg>
+                    <span>ડાયરેક્ટ પે કરો</span>
+                </button>
+            </div>
+
+        </main>
+
+        <!-- Informative Guide for Dad -->
+        <div class="info-box">
+            <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div class="info-text">
+                <strong>પપ્પા માટે મદદ:</strong> જો ડાયરેક્ટ પેમાં ₹૨,૦૦૦ ની લિમિટ આવે, તો <strong>"QR કોડ ડાઉનલોડ કરો"</strong> દબાવી દો. પછી Google Pay અથવા PhonePe ના સ્કેનરમાં જઈને <strong>"Upload from Gallery"</strong> થી આ ફોટો પસંદ કરી પેમેન્ટ કરો (કોઈ લિમિટ નહીં આવે).
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast">
+        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+        </svg>
+        <span id="toastMsg">QR કોડ ડાઉનલોડ થઈ ગયો!</span>
+    </div>
+
+    <script>
+        const accounts = {
+            fampay: {
+                name: 'Fam Pay',
+                qrUrl: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjjZUzhw7gLlDmCmSHBAs4DalkwSsca3elp1KiZxVMIhE2tafDNT-oWn-ywPslUuSh0knTXmLU59u-GwBi7D-1KOi3hEe1N_VE28HtxkHmIC4l3CGBWF7uxfgPpzMsN3HN-oIBsU5bmdeGk7YV0ZDe71TR2Xr8ThDb4QoVzOF4ndiuj2M1Ey8PkhUvBetI/s759/1000037329.png',
+                upiUrl: 'upi://pay?pa=9173456004@fam&pn=Chintan&cu=INR',
+                filename: 'FamPay_QR_Chintan.png'
+            },
+            post: {
+                name: 'Indian Post',
+                qrUrl: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjRq2PN7D3Qms4sYQI0PYUrPrlne9gVGrmLTSeCwl5kA3Uk5x6cI1YrFHq6HpUevfwwipRg0NphsNUxXSG-W9Nt6ZK0UhrQs8scn0sOgw_N4sj3iF3NvWctoE3OU5QfBdlWT1Y6JJEARlAjABcCmCigtEqY1RaGSr7XoTL5LpvxypkJfk0SW2h3McwKgdI/s1521/1000037330.png',
+                upiUrl: 'upi://pay?pa=limbachiya660@naviaxis&pn=Chintan&cu=INR',
+                filename: 'IndianPost_QR_Chintan.png'
+            }
+        };
+
+        let selected = 'fampay';
+
+        function selectAccount(type) {
+            selected = type;
+            const imgEl = document.getElementById('qrDisplay');
+            const tabFampay = document.getElementById('tabFampay');
+            const tabPost = document.getElementById('tabPost');
+
+            imgEl.src = accounts[type].qrUrl;
+
+            if (type === 'fampay') {
+                tabFampay.className = 'tab-btn active-fampay';
+                tabFampay.querySelector('.tab-sub').innerText = 'પસંદ કરેલું છે';
+
+                tabPost.className = 'tab-btn';
+                tabPost.querySelector('.tab-sub').innerText = 'ક્લિક કરો';
+            } else {
+                tabPost.className = 'tab-btn active-post';
+                tabPost.querySelector('.tab-sub').innerText = 'પસંદ કરેલું છે';
+
+                tabFampay.className = 'tab-btn';
+                tabFampay.querySelector('.tab-sub').innerText = 'ક્લિક કરો';
+            }
+        }
+
+        // Direct Pay intent launch
+        function triggerDirectPay() {
+            window.location.href = accounts[selected].upiUrl;
+        }
+
+        // Reliable QR image download to phone storage
+        async function downloadActiveQR() {
+            showToast('ડાઉનલોડ શરૂ થઈ રહ્યું છે...');
+            const account = accounts[selected];
+
+            try {
+                const response = await fetch(account.qrUrl);
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = account.filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(blobUrl);
+
+                showToast('QR કોડ ફોનમાં સેવ થઈ ગયો!');
+            } catch (err) {
+                // Fallback for strict browser environments
+                const fallbackLink = document.createElement('a');
+                fallbackLink.href = account.qrUrl;
+                fallbackLink.target = '_blank';
+                fallbackLink.download = account.filename;
+                document.body.appendChild(fallbackLink);
+                fallbackLink.click();
+                document.body.removeChild(fallbackLink);
+                showToast('QR કોડ ખોલવામાં આવ્યો છે');
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2600);
+        }
+    </script>
+</body>
+</html>
